@@ -29,6 +29,7 @@ namespace FileManager1
        public abstract void Move(string MovePath);
        public abstract void Delete();
        public abstract void Copy(string CopyPath);
+       
       
         
     }

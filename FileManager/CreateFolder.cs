@@ -51,5 +51,10 @@ namespace FileManager1
             create = false;
             Close();
         }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

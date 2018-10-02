@@ -8,3 +8,12 @@ C:\Users\PC\source\repos\FileManager\FileManager\bin\Debug\FileManager1.exe
 C:\Users\PC\source\repos\FileManager\FileManager\bin\Debug\FileManager1.pdb
 C:\Users\PC\source\repos\FileManager\FileManager\obj\Debug\FileManager1.exe
 C:\Users\PC\source\repos\FileManager\FileManager\obj\Debug\FileManager1.pdb
+C:\Users\PC\source\repos\FileManager\FileManager\obj\Debug\FileManager1.TextEditor.resources
+C:\Users\PC\source\repos\FileManager\FileManager\bin\Debug\MetroFramework.dll
+C:\Users\PC\source\repos\FileManager\FileManager\bin\Debug\MetroFramework.Fonts.dll
+C:\Users\PC\source\repos\FileManager\FileManager\obj\Debug\FileManager.csproj.CopyComplete
+C:\Users\PC\source\repos\FileManager\FileManager\obj\Debug\FileManager1.Properties.Resources.resources
+C:\Users\PC\source\repos\FileManager\FileManager\obj\Debug\FileManager1.HtmlEditor.resources
+C:\Users\PC\source\repos\FileManager\FileManager\obj\Debug\FileManager1.SearchForm.resources
+C:\Users\PC\source\repos\FileManager\FileManager\obj\Debug\FileManager1.ResultSearch.resources
+C:\Users\PC\source\repos\FileManager\FileManager\obj\Debug\FileManager1.ReportForm.resources

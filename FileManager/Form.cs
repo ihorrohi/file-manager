@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Xml.XPath;
 using System.Xml;
 using System.IO;
+using System.Diagnostics;
 
 namespace FileManager1
 {
@@ -24,84 +25,85 @@ namespace FileManager1
 
             InitializeComponent();
             presenter = new Presenter(this);
-            
-            
-            listView1.MouseDoubleClick += listView1_MouseDoubleClick;
-            listView2.MouseDoubleClick += listView2_MouseDoubleClick;
-            listView1.Enter += listView1_Enter;
-            listView2.Enter += listView2_Enter;
+
+            presenter.ClearReport();
+            presenter.ReportHeader();
+            listView1.MouseDoubleClick += ListView1_MouseDoubleClick;
+            listView2.MouseDoubleClick += ListView2_MouseDoubleClick;
+            listView1.Enter += ListView1_Enter;
+            listView2.Enter += ListView2_Enter;
             drives = Environment.GetLogicalDrives();
-            for(int i=0;i<drives.Length;i++)
+            for (int i = 0; i < drives.Length; i++)
             {
                 comboBox1.Items.Add(drives[i]);
                 comboBox2.Items.Add(drives[i]);
             }
             comboBox1.Text = drives[0];
             comboBox2.Text = drives[0];
-            presenter.refresh(listView1, @drives[0]);
-            presenter.refresh(listView2, @drives[0]);
-            comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
-            comboBox2.SelectedIndexChanged += comboBox2_SelectedIndexChanged;
+            presenter.Refresh(listView1, @drives[0]);
+            presenter.Refresh(listView2, @drives[0]);
+            comboBox1.SelectedIndexChanged += ComboBox1_SelectedIndexChanged;
+            comboBox2.SelectedIndexChanged += ComboBox2_SelectedIndexChanged;
         }
 
-        void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        void ComboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
 
             string path = drives[comboBox2.SelectedIndex];
 
             try
             {
-                presenter.refresh(listView2, path);
+                presenter.Refresh(listView2, path);
                 presenter.CurrentPath2 = path;
             }
             catch (IOException ex)
             {
-                MessageBox.Show("Not found","Error");
+                MessageBox.Show("Not found", "Error");
                 comboBox1.Text = drives[0];
                 path = @"C:\";
-                presenter.refresh(listView2, path);
+                presenter.Refresh(listView2, path);
                 presenter.CurrentPath2 = path;
             }
         }
 
-        void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            
+
             string path = drives[comboBox1.SelectedIndex];
-           
+
             try
             {
-                presenter.refresh(listView1, path); 
+                presenter.Refresh(listView1, path);
                 presenter.CurrentPath1 = path;
             }
-            catch(IOException ex) 
+            catch (IOException ex)
             {
                 MessageBox.Show("Not found", "Error");
                 comboBox1.Text = drives[0];
                 path = @"C:\";
-                presenter.refresh(listView1, path);
+                presenter.Refresh(listView1, path);
                 presenter.CurrentPath1 = path;
             }
         }
 
-        void listView2_Enter(object sender, EventArgs e)
+        void ListView2_Enter(object sender, EventArgs e)
         {
             activeListView = 2;
         }
 
-        void listView1_Enter(object sender, EventArgs e)
+        void ListView1_Enter(object sender, EventArgs e)
         {
             activeListView = 1;
         }
-     
 
-        void listView1_MouseDoubleClick(object sender, MouseEventArgs e)
-        { 
-            presenter.openItem(listView1,true);
-        }
-        void listView2_MouseDoubleClick(object sender, MouseEventArgs e)
+
+        void ListView1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            presenter.openItem(listView2,false);
+            presenter.OpenItem(listView1, true);
+        }
+        void ListView2_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            presenter.OpenItem(listView2, false);
         }
 
         private void CopyMenuItem_Click(object sender, EventArgs e)
@@ -112,19 +114,20 @@ namespace FileManager1
                 {
                     if (listView1.SelectedItems.Count > 0)
                     {
-                        presenter.addToBuffer(listView1, true);
+                        presenter.AddToBuffer(listView1, true);
                     }
                 }
                 else
                     if (listView2.SelectedItems.Count > 0)
-                    {
-                        presenter.addToBuffer(listView2, false);
-                    }
+                {
+                    presenter.AddToBuffer(listView2, false);
+                }
+
 
             }
             catch
             {
-                MessageBox.Show("Copy failed","Error");
+                MessageBox.Show("Copy failed", "Error");
             }
         }
 
@@ -136,14 +139,14 @@ namespace FileManager1
                 {
                     if (listView1.SelectedItems.Count > 0)
                     {
-                        presenter.Move(listView1,true);
+                        presenter.Move(listView1, true);
                     }
                 }
                 else
                     if (listView2.SelectedItems.Count > 0)
-                        presenter.Move(listView2, false);
+                    presenter.Move(listView2, false);
             }
-            catch(IOException ex)
+            catch (IOException ex)
             {
                 MessageBox.Show("Impossible", "Error");
             }
@@ -153,8 +156,8 @@ namespace FileManager1
             }
             finally
             {
-                presenter.refresh(listView1, presenter.CurrentPath1);
-                presenter.refresh(listView2, presenter.CurrentPath2);
+                presenter.Refresh(listView1, presenter.CurrentPath1);
+                presenter.Refresh(listView2, presenter.CurrentPath2);
             }
         }
 
@@ -166,13 +169,13 @@ namespace FileManager1
                 {
                     if (listView1.SelectedItems.Count > 0)
                     {
-                        presenter.Delete(listView1,true);
+                        presenter.Delete(listView1, true);
                     }
                 }
                 else
                     if (listView2.SelectedItems.Count > 0)
-                        presenter.Delete(listView2,false);
-                
+                    presenter.Delete(listView2, false);
+
             }
             catch
             {
@@ -180,41 +183,41 @@ namespace FileManager1
             }
             finally
             {
-                presenter.refresh(listView1, presenter.CurrentPath1);
-                presenter.refresh(listView2, presenter.CurrentPath2);
+                presenter.Refresh(listView1, presenter.CurrentPath1);
+                presenter.Refresh(listView2, presenter.CurrentPath2);
             }
         }
 
-        private void buttonBack1_Click(object sender, EventArgs e)
+        private void ButtonBack1_Click(object sender, EventArgs e)
         {
             presenter.Back(listView1, true);
         }
 
-        private void buttonBack2_Click(object sender, EventArgs e)
+        private void ButtonBack2_Click(object sender, EventArgs e)
         {
             presenter.Back(listView2, false);
         }
 
-        private void buttonRefresh1_Click(object sender, EventArgs e)
+        private void ButtonRefresh1_Click(object sender, EventArgs e)
         {
-            presenter.refresh(listView1, presenter.CurrentPath1);
+            presenter.Refresh(listView1, presenter.CurrentPath1);
         }
 
-        private void buttonRefresh2_Click(object sender, EventArgs e)
+        private void ButtonRefresh2_Click(object sender, EventArgs e)
         {
-            presenter.refresh(listView2, presenter.CurrentPath2);
+            presenter.Refresh(listView2, presenter.CurrentPath2);
         }
         private void InsertToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
             {
                 if (activeListView == 1)
-                        presenter.Paste(listView1, true);
+                    presenter.Paste(listView1, true);
                 else
-                        presenter.Paste(listView2, false);
+                    presenter.Paste(listView2, false);
 
             }
-                catch(IOException ex)
+            catch (IOException ex)
             {
                 MessageBox.Show("Impossible", "Error");
             }
@@ -224,42 +227,42 @@ namespace FileManager1
             }
             finally
             {
-                presenter.refresh(listView1, presenter.CurrentPath1);
-                presenter.refresh(listView2, presenter.CurrentPath2);
+                presenter.Refresh(listView1, presenter.CurrentPath1);
+                presenter.Refresh(listView2, presenter.CurrentPath2);
             }
         }
 
-        private void buttonAddFolder1_Click(object sender, EventArgs e)
+        private void ButtonAddFolder1_Click(object sender, EventArgs e)
         {
             presenter.CreateNewFolder(true);
-            presenter.refresh(listView1, presenter.CurrentPath1);
-            presenter.refresh(listView2, presenter.CurrentPath2);
+            presenter.Refresh(listView1, presenter.CurrentPath1);
+            presenter.Refresh(listView2, presenter.CurrentPath2);
         }
 
-        private void buttonAddFile1_Click(object sender, EventArgs e)
+        private void ButtonAddFile1_Click(object sender, EventArgs e)
         {
             presenter.CreateNewFile(true);
-            presenter.refresh(listView1, presenter.CurrentPath1);
-            presenter.refresh(listView2, presenter.CurrentPath2);
+            presenter.Refresh(listView1, presenter.CurrentPath1);
+            presenter.Refresh(listView2, presenter.CurrentPath2);
         }
 
-        private void buttonAddFolder2_Click(object sender, EventArgs e)
+        private void ButtonAddFolder2_Click(object sender, EventArgs e)
         {
             presenter.CreateNewFolder(false);
-            presenter.refresh(listView1, presenter.CurrentPath1);
-            presenter.refresh(listView2, presenter.CurrentPath2);
+            presenter.Refresh(listView1, presenter.CurrentPath1);
+            presenter.Refresh(listView2, presenter.CurrentPath2);
         }
 
-        private void buttonAddFile2_Click(object sender, EventArgs e)
+        private void ButtonAddFile2_Click(object sender, EventArgs e)
         {
             presenter.CreateNewFile(false);
-            presenter.refresh(listView1, presenter.CurrentPath1);
-            presenter.refresh(listView2, presenter.CurrentPath2);
+            presenter.Refresh(listView1, presenter.CurrentPath1);
+            presenter.Refresh(listView2, presenter.CurrentPath2);
         }
 
-        private void aboutProgramToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AboutProgramToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Made by Ihor Piontkovskyi 2018");
+            MessageBox.Show("Made by Ihor Piontkovskyi 2018", "About program");
         }
 
 
@@ -267,14 +270,44 @@ namespace FileManager1
         {
             if (activeListView == 1)
             {
-                    presenter.MoveToDirectory(listView1, true);
+                presenter.MoveToDirectory(listView1, true);
             }
             else
-                    presenter.MoveToDirectory(listView2, false);
-            
-                presenter.refresh(listView1, presenter.CurrentPath1);
-                presenter.refresh(listView2, presenter.CurrentPath2);
+                presenter.MoveToDirectory(listView2, false);
+
+            presenter.Refresh(listView1, presenter.CurrentPath1);
+            presenter.Refresh(listView2, presenter.CurrentPath2);
         }
-        
-      }
-   }
+
+        private void SearchForUnrepeatableWordsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            if (activeListView == 1)
+            {
+                presenter.WordsIncludesInFile(listView1, true);
+            }
+            else
+            {
+                presenter.WordsIncludesInFile(listView1, false); 
+            }
+        }
+
+        private void SearchHTMLFileByTitleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (activeListView == 1)
+            {
+                presenter.SearchHtmlByTitle(listView1, true);
+            }
+            else
+            {
+                presenter.SearchHtmlByTitle(listView2, false);
+            }
+        }
+
+
+        private void HelpToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Process.Start(Environment.CurrentDirectory.ToString() + "Resource\\Help.txt");
+        }
+    }
+}

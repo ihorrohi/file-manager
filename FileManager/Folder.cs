@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
+﻿using System.IO;
 
 namespace FileManager1
 {
@@ -52,7 +47,7 @@ namespace FileManager1
                   File.Copy(files[i], CopyPath + "\\" +Name+"\\"+ files[i].Substring(files[i].LastIndexOf("\\")));
               }
           }
-         public bool isExist()
+         public bool IsExist()
           {
               if (Directory.Exists(Path)) return true;
               else return false;

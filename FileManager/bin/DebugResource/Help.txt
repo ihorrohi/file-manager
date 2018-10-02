@@ -1,0 +1,61 @@
+File Manager version 1.0
+____________________________
+
+MAIN
+============================
+1.Pressing the button BACK - in active list folder will open on 1 thread higer;
+2.Pressing the button REFRESH - current lisr will refreshed;
+3.Pressing the button ADD FILE - will open new file creation window;
+4.Pressing the button ADD FOLDER - will open new folder creation window;
+5.Choosing the PARTITION HD - the active list will open choosed patition;
+6.Mouse double click on item - open item;
+
+CONTEXT MENU
+===========================
+
+1. Pressing COPY on the selected items - items will add to buffer;
+2. Pressing MOVE on the selected items - items will move into other list;
+3. Pressing PASTE on the selected items - items will paste from buffer to current folder;
+4. Pressing DELETE on the selected items - items will delete from patition;
+5. Pressing SEARCH FOR UNREPEATABLE WORDS on the selcted TXT item - will search and open the new window with results;
+6. Pressing SEARCH HTML BY TITLE - will open Search window;
+
+///
+TO SELECT MULTIPLE FILES - press Ctrl
+///
+
+SEARCH HTML BY TITLE
+============================
+
+If you enter a keyword and click on the button "Search" the program will search by html files in the folder 
+where the search was called; The search is that the program searches for keywords in titels inside HTML - file. 
+If search was successful then will open the result window with list of HTML-files wich includes keywords in title.
+And if you open this file the background color of headers will be highlighted.
+
+\\\\\\\\\\\\\\\\\\\\\\\\\\\
+TEXT EDITOR
+============================
+
+-MAIN MENU
+1.Pressing SAVE - save this txt file;
+2.Pressing CLEAR - clear this txt file;
+
+-SEARCH MENU 
+1.Pressing ENTER or SEARCH - start search;
+
+-TEXT MENU
+1.Pressing ESCAPE - set default backgrounds highlight;
+
+\\\\\\\\\\\\\\\\\\\\\\\\\\\
+HTML EDITOR
+============================
+
+-MAIN MENU
+1.Pressing SAVE - save this txt file;
+2.Pressing CLEAR - clear this txt file;
+
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+REPORT WINDOW
+=============================
+
+1.Pressing open - report file will open in standart program.

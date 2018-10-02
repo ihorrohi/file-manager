@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreateFolder));
             this.buttonCreate = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
@@ -37,7 +38,7 @@
             // buttonCreate
             // 
             this.buttonCreate.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonCreate.Location = new System.Drawing.Point(102, 114);
+            this.buttonCreate.Location = new System.Drawing.Point(12, 145);
             this.buttonCreate.Name = "buttonCreate";
             this.buttonCreate.Size = new System.Drawing.Size(75, 23);
             this.buttonCreate.TabIndex = 0;
@@ -48,7 +49,7 @@
             // buttonCancel
             // 
             this.buttonCancel.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonCancel.Location = new System.Drawing.Point(281, 114);
+            this.buttonCancel.Location = new System.Drawing.Point(252, 145);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(75, 23);
             this.buttonCancel.TabIndex = 1;
@@ -58,29 +59,32 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(102, 53);
+            this.textBox1.Location = new System.Drawing.Point(40, 84);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(254, 20);
             this.textBox1.TabIndex = 2;
             // 
             // label1
             // 
-            this.label1.Location = new System.Drawing.Point(102, 23);
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
+            this.label1.Location = new System.Drawing.Point(40, 31);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(254, 27);
+            this.label1.Size = new System.Drawing.Size(251, 27);
             this.label1.TabIndex = 3;
+            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // CreateFolder
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(439, 218);
+            this.ClientSize = new System.Drawing.Size(339, 180);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonCreate);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "CreateFolder";
-            this.Text = "CreateFolder";
+            this.Text = "Create";
             this.ResumeLayout(false);
             this.PerformLayout();
 

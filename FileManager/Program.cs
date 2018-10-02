@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace FileManager1
@@ -17,6 +14,7 @@ namespace FileManager1
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new FileManager());
+            Application.Run(new ReportForm());
         }
     }
 }
