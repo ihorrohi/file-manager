@@ -7,42 +7,137 @@ using System.Threading.Tasks;
 
 namespace FileManager1
 {
-    class Report : Conteiner
+    class ReportItem
     {
-        private string name;
-         public string Name
-         {
-           get {return name;}
-           set {name=value;}
-         }
-        public Report (string path) : base(path)
+        public string time;
+        public string operation;
+        public string getReport()
         {
-            Name = path.Substring(path.LastIndexOf("\\") + 1);
+            return time + operation;
         }
-
-        public override void Copy(string copyPath)
+    }
+    abstract class ReportBuilder
+    {
+        protected ReportItem RItem = new ReportItem();
+        protected string Path;
+        protected string ActionPath;
+        public ReportBuilder(string path){}
+        public ReportBuilder(string path,string additional){}
+        public ReportItem GetReportItem()
         {
-
-            File.AppendAllText(Environment.CurrentDirectory.ToString() + "Report\\Report.txt", DateTime.Now.ToString() + " Copy. " + Path + "\n" + Environment.NewLine);
+            return RItem;
         }
-
-        public override void Delete()
+        public abstract void setOperation();
+    }
+    class CopyReportItemBuilder : ReportBuilder
+    {
+        public CopyReportItemBuilder(string path, string additional) : base(path, additional)
         {
-            File.AppendAllText(Environment.CurrentDirectory.ToString() + "Report\\Report.txt", DateTime.Now.ToString() + "Delete item " + Path + "\n" + Environment.NewLine);
+            Path = path;
+            ActionPath = additional;
         }
-
-        public override void Move(string movePath)
+        public override void setOperation()
         {
-            File.AppendAllText(Environment.CurrentDirectory.ToString() + "Report\\Report.txt", DateTime.Now.ToString() + " Move. " + Path + "\n" + Environment.NewLine);
+            RItem.time = DateTime.Now.ToString();
+            RItem.operation = " Copy from " + Path + " to "+ ActionPath;
         }
-        public void Create()
+    }
+    class DeleteReportItemBuilder : ReportBuilder
+    {
+        public DeleteReportItemBuilder(string path) : base(path)
         {
-            File.AppendAllText(Environment.CurrentDirectory.ToString() + "Report\\Report.txt", DateTime.Now.ToString() + " Create. " + Path + "\n" + Environment.NewLine);
+            Path = path;
         }
-        public void Open()
+        public override void setOperation()
         {
-            File.AppendAllText(Environment.CurrentDirectory.ToString() + "Report\\Report.txt", DateTime.Now.ToString() + " Open. "  + Path + "\n" + Environment.NewLine);
+            RItem.time = DateTime.Now.ToString();
+            RItem.operation = " Delete " + Path;
         }
-
+    }
+    class CreateReportItemBuilder : ReportBuilder
+    {
+        public CreateReportItemBuilder(string path) : base(path)
+        {
+            Path = path;
+        }
+        public override void setOperation()
+        {
+            RItem.time = DateTime.Now.ToString();
+            RItem.operation = " Create " + Path;
+        }
+    }
+    class MoveReportItemBuilder : ReportBuilder
+    {
+        public MoveReportItemBuilder(string path, string additional) : base(path, additional)
+        {
+            Path = path;
+            ActionPath = additional;
+        }
+        public override void setOperation()
+        {
+            RItem.time = DateTime.Now.ToString();
+            RItem.operation = " Move from " + Path + " to " + ActionPath;
+        }
+    }
+    class OpenReportItemBuilder : ReportBuilder
+    {
+        public OpenReportItemBuilder(string path) : base(path)
+        {
+            Path = path;
+        }
+        public override void setOperation()
+        {
+            RItem.time = DateTime.Now.ToString();
+            RItem.operation = " Open " + Path;
+        }
+    }
+    class RenameReportItemBuilder : ReportBuilder
+    {
+        public RenameReportItemBuilder(string path, string additional) : base(path, additional)
+        {
+            Path = path;
+            ActionPath = additional;
+        }
+        public override void setOperation()
+        {
+            RItem.time = DateTime.Now.ToString();
+            RItem.operation = " Rename from " + Path + " to " + ActionPath;
+        }
+    }
+    class Director
+    {
+        private ReportBuilder builder;
+        public void CopyReport(string path, string ActionPath)
+        {
+            this.builder = new CopyReportItemBuilder(path,ActionPath);
+        }
+        public void MoveReport(string path, string ActionPath)
+        {
+            this.builder = new MoveReportItemBuilder(path, ActionPath);
+        }
+        public void DeleteReport(string path)
+        {
+            this.builder = new DeleteReportItemBuilder(path);
+        }
+        public void OpenReport(string path)
+        {
+            this.builder = new OpenReportItemBuilder(path);
+        }
+        public void CreateReport(string path)
+        {
+            this.builder = new CreateReportItemBuilder(path);
+        }
+        public void RenameReport(string path, string ActionPath)
+        {
+            this.builder = new RenameReportItemBuilder(path, ActionPath);
+        }
+        public ReportItem GetReportItem()
+        {
+            return builder.GetReportItem();
+        }
+        public void BuildReport()
+        {
+            builder.setOperation();
+        }
     }
 }

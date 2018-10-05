@@ -21,6 +21,7 @@ namespace FileManager1
 
         private void button1_Click(object sender, EventArgs e)
         {
+            Presenter.CreateReport();
             string path = Environment.CurrentDirectory.ToString() + "Report\\Report.txt";
             Process.Start(path);
             Close();

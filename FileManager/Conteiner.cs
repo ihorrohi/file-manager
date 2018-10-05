@@ -24,13 +24,10 @@ namespace FileManager1
        {
            Path = path;
        }
-      
-       
-       public abstract void Move(string MovePath);
-       public abstract void Delete();
-       public abstract void Copy(string CopyPath);
-       
-      
+        public abstract void Move(string movePath);
+        public abstract void Delete();
+        public abstract void Copy(string copyPath);
+        public abstract void Rename(string NewName);
         
     }
   

@@ -14,11 +14,16 @@ namespace FileManager1
 {
     public class Presenter
     {
+        
         static List<string> pathes = new List<string>();
         List<Folder> foldersToCopy = new List<Folder>();
         List<CommonFile> filesToCopy = new List<CommonFile>();
+        static List<ReportItem> reports = new List<ReportItem>();
+        Director director = new Director();
+
         string currentPath1 = @"C:\";
         string currentPath2 = @"C:\";
+        string contentForMerging = "";
         public string CurrentPath1
         {
             get
@@ -41,18 +46,23 @@ namespace FileManager1
                 currentPath2 = @value;
             }
         }
+
         readonly FileManager fileManager;
+
         public Presenter(FileManager FManager)
         {
             fileManager = FManager;
         }
-        public void ClearReport()
+        
+        static public void CreateReport()
         {
             File.Delete(Environment.CurrentDirectory.ToString() + "Report\\Report.txt");
-        }
-        public void ReportHeader()
-        {
-            File.AppendAllText(Environment.CurrentDirectory.ToString() + "Report\\Report.txt", "Report on working File Manager. " + DateTime.Now.ToString() + Environment.NewLine);
+            File.AppendAllText(Environment.CurrentDirectory.ToString() + "Report\\Report.txt", "Report on working File Manager. " + Environment.NewLine);
+            foreach(var item in reports)
+            {
+                File.AppendAllText(Environment.CurrentDirectory.ToString() + "Report\\Report.txt", item.getReport() + Environment.NewLine);
+            }
+            File.AppendAllText(Environment.CurrentDirectory.ToString() + "Report\\Report.txt", "Thank you " + DateTime.Now.ToString());
         }
         static bool IsEqual(string str1, string str2, int len)
         {
@@ -99,8 +109,6 @@ namespace FileManager1
                 item.SubItems.AddRange(subItems);
                 list.Items.Add(item);
             }
-            Report openObject = new Report(path);
-            openObject.Open();
             list.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
         }
         public void OpenItem(ListView list, bool left)
@@ -130,6 +138,9 @@ namespace FileManager1
                 {
                     MessageBox.Show("You haven`t access", "Error");
                 }
+                director.OpenReport(currentPath);
+                director.BuildReport();
+                reports.Add(director.GetReportItem());
             }
             else
             {
@@ -142,17 +153,20 @@ namespace FileManager1
                     {
 
                         content = cf.GetText(new TxtFile(currentPath));
-                        TextEditor TEdit = new TextEditor(content, currentPath);
+                        TextEditorForm TEdit = new TextEditorForm(content, currentPath, false);
                         TEdit.ShowDialog();
                     }
                     else if (currentPath.Substring(currentPath.LastIndexOf(".") + 1) == "html")
                     {
 
                         content = cf.GetText(new HtmlFile(currentPath));
-                        HtmlEditor HEdit = new HtmlEditor(content, currentPath);
+                        TextEditorForm HEdit = new TextEditorForm(content, currentPath, false);
                         HEdit.ShowDialog();
                     }
                     else Process.Start(currentPath);
+                    director.OpenReport(path);
+                    director.BuildReport();
+                    reports.Add(director.GetReportItem());
 
                 }
                 catch (InvalidOperationException ex)
@@ -177,15 +191,31 @@ namespace FileManager1
                         Folder folder = new Folder(currentPath + "\\" + list.Items[i].Text);
                         if (left)
                         {
-                            folder.Move(currentPath2);
-                            Report moveObject = new Report(currentPath);
-                            moveObject.Move(currentPath2);
+                            if (!Directory.Exists(currentPath2 + "\\" + list.Items[i].Text))
+                            {
+                                folder.Move(currentPath2);
+                                director.MoveReport(currentPath + "\\" + list.Items[i].Text, currentPath2 + "\\" + list.Items[i].Text);
+                                director.BuildReport();
+                                reports.Add(director.GetReportItem());
+                            }
+                            else
+                            {
+                                MessageBox.Show("The folder is already exists", "Error");
+                            }
                         }
                         else
                         {
-                            folder.Move(currentPath1);
-                            Report moveObject = new Report(currentPath);
-                            moveObject.Move(currentPath1);
+                            if (!Directory.Exists(currentPath1 + "\\" + list.Items[i].Text))
+                            {
+                                folder.Move(currentPath1);
+                                director.MoveReport(currentPath + "\\" + list.Items[i].Text, currentPath1 + "\\" + list.Items[i].Text);
+                                director.BuildReport();
+                                reports.Add(director.GetReportItem());
+                            }
+                            else
+                            {
+                                MessageBox.Show("The folder is already exists", "Error");
+                            }
                         }
                     }
                     else
@@ -193,15 +223,31 @@ namespace FileManager1
                         CommonFile file = new CommonFile(currentPath + "\\" + list.Items[i].Text);
                         if (left)
                         {
-                            file.Move(currentPath2);
-                            Report moveObject = new Report(currentPath);
-                            moveObject.Move(currentPath2);
+                            if (!File.Exists(currentPath2 + "\\" + list.Items[i].Text))
+                            {
+                                file.Move(currentPath2);
+                                director.MoveReport(currentPath + "\\" + list.Items[i].Text, currentPath2 + "\\" + list.Items[i].Text);
+                                director.BuildReport();
+                                reports.Add(director.GetReportItem());
+                            }
+                            else
+                            {
+                                MessageBox.Show("The file is already exists", "Error");
+                            }
                         }
                         else
                         {
-                            file.Move(currentPath1);
-                            Report moveObject = new Report(currentPath);
-                            moveObject.Move(currentPath1);
+                            if (!File.Exists(currentPath1 + "\\" + list.Items[i].Text))
+                            {
+                                file.Move(currentPath1);
+                                director.MoveReport(currentPath + "\\" + list.Items[i].Text, currentPath1 + "\\" + list.Items[i].Text);
+                                director.BuildReport();
+                                reports.Add(director.GetReportItem());
+                            }
+                            else
+                            {
+                                MessageBox.Show("The file is already exists", "Error");
+                            }
                         }
                     }
                 }
@@ -216,24 +262,31 @@ namespace FileManager1
                 currentPath = currentPath1;
             else
                 currentPath = currentPath2;
-            if (list.SelectedItems.Count > 0)
+            WarningForm warningForm = new WarningForm(false);
+            warningForm.ShowDialog();
+            if (warningForm.action)
             {
-                foreach (int i in list.SelectedIndices)
+                if (list.SelectedItems.Count > 0)
                 {
-                    if (list.Items[i].ImageIndex == 0)
+                    foreach (int i in list.SelectedIndices)
                     {
+                        if (list.Items[i].ImageIndex == 0)
+                        {
 
-                        Folder folder = new Folder(currentPath + "\\" + list.Items[i].Text);
-                        folder.Delete();
-                        Report deleteObject = new Report(currentPath + "\\" + list.Items[i].Text);
-                        deleteObject.Delete();
-                    }
-                    else
-                    {
-                        CommonFile file = new CommonFile(currentPath + "\\" + list.Items[i].Text);
-                        file.Delete();
-                        Report deleteObject = new Report(currentPath + "\\" + list.Items[i].Text);
-                        deleteObject.Delete();
+                            Folder folder = new Folder(currentPath + "\\" + list.Items[i].Text);
+                            folder.Delete();
+                            director.DeleteReport(currentPath + "\\" + list.Items[i].Text);
+                            director.BuildReport();
+                            reports.Add(director.GetReportItem());
+                        }
+                        else
+                        {
+                            CommonFile file = new CommonFile(currentPath + "\\" + list.Items[i].Text);
+                            file.Delete();
+                            director.DeleteReport(currentPath + "\\" + list.Items[i].Text);
+                            director.BuildReport();
+                            reports.Add(director.GetReportItem());
+                        }
                     }
                 }
             }
@@ -295,6 +348,63 @@ namespace FileManager1
             }
 
         }
+        public void Rename(ListView list, bool left)
+        {
+            string path = list.SelectedItems[0].Text;
+            string currentPath;
+
+            if (left)
+                currentPath = String.Format(@"{0}\\{1}", currentPath1, path);
+            else
+                currentPath = String.Format(@"{0}\\{1}", currentPath2, path);
+            LabelForm labelForm = new LabelForm(-1);
+            labelForm.ShowDialog();
+            try
+            {
+                if (list.SelectedItems[0].ImageIndex == 0)
+                {
+                    if (labelForm.done)
+                    {
+                        if (!Directory.Exists(currentPath + "\\" + labelForm.text))
+                        {
+                            Folder folder = new Folder(currentPath);
+                            folder.Rename(labelForm.text);
+                            director.RenameReport(path, labelForm.text);
+                            director.BuildReport();
+                            reports.Add(director.GetReportItem());
+                        }
+                        else
+                        {
+                            MessageBox.Show("Such a folder is already exists", "Error");
+                        }
+                    }
+                }
+                else
+                {
+                    if (!File.Exists(currentPath + "\\" + labelForm.text))
+                    {
+                        if (labelForm.done)
+                        {
+                            CommonFile commonFile = new CommonFile(currentPath);
+                            commonFile.Rename(labelForm.text);
+                            director.RenameReport(path, labelForm.text);
+                            director.BuildReport();
+                            reports.Add(director.GetReportItem());
+                        }
+                        labelForm.Dispose();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Such a file is already exists", "Error");
+                    }
+                }
+            }
+            catch (Exception error)
+            {
+                labelForm.Dispose();
+                MessageBox.Show(error.Message.ToString(), "Error");
+            }
+        }
         public void Paste(ListView list, bool left)
         {
             string currentPath;
@@ -311,8 +421,13 @@ namespace FileManager1
                     if (!Directory.Exists(currentPath + "\\" + foldersToCopy[i].Name))
                     {
                         foldersToCopy[i].Copy(currentPath);
-                        Report copyObject = new Report(currentPath + "\\" + list.Items[i].Text);
-                        copyObject.Copy(currentPath);
+                        director.CopyReport(foldersToCopy[i].Path, currentPath + "\\" + foldersToCopy[i].Name);
+                        director.BuildReport();
+                        reports.Add(director.GetReportItem());
+                    }
+                    else
+                    {
+                        MessageBox.Show("The folder is already exists", "Error");
                     }
                 }
             }
@@ -321,13 +436,17 @@ namespace FileManager1
 
                 for (int i = 0; i < filesToCopy.Count; i++)
                 {
-
                     if (!File.Exists(currentPath + "\\" + filesToCopy[i].Name))
                     {
 
                         filesToCopy[i].Copy(currentPath);
-                        Report copyObject = new Report(currentPath + "\\" + list.Items[i].Text);
-                        copyObject.Copy(currentPath);
+                        director.CopyReport(filesToCopy[i].Path, currentPath + "\\" + filesToCopy[i].Name);
+                        director.BuildReport();
+                        reports.Add(director.GetReportItem());
+                    }
+                    else
+                    {
+                        MessageBox.Show("The file is already exists", "Error");
                     }
                 }
             }
@@ -338,28 +457,30 @@ namespace FileManager1
             if (left) currentPath = CurrentPath1;
             else currentPath = CurrentPath2;
 
-            CreateFolder createFolder = new CreateFolder();
-            createFolder.ShowDialog();
+            LabelForm labelForm = new LabelForm(1);
+            labelForm.ShowDialog();
             try
             {
-                if (createFolder.create)
+                if (labelForm.done)
                 {
-                    if (!Directory.Exists(currentPath + "\\" + createFolder.path))
+                    if (!Directory.Exists(currentPath + "\\" + labelForm.text))
                     {
-                        Directory.CreateDirectory(currentPath + "\\" + createFolder.path);
-                        Report createObject = new Report(currentPath + "\\" + createFolder.path);
-                        createObject.Create();
+                        Directory.CreateDirectory(currentPath + "\\" + labelForm.text);
+                        director.CreateReport(currentPath + "\\" + labelForm.text);
+                        director.BuildReport();
+                        reports.Add(director.GetReportItem());
+
                     }
 
                     else
                         MessageBox.Show("Such a folder already exists", "Error");
                 }
-                createFolder.Dispose();
+                labelForm.Dispose();
             }
-            catch(Exception error)
+            catch (Exception error)
             {
-                createFolder.Dispose();
-                MessageBox.Show("You haven`t access", "Error");
+                labelForm.Dispose();
+                MessageBox.Show(error.Message.ToString(), "Error");
             }
         }
         public void CreateNewFile(bool left)
@@ -368,27 +489,29 @@ namespace FileManager1
             if (left) currentPath = CurrentPath1;
             else currentPath = CurrentPath2;
 
-            CreateFolder createFile = new CreateFolder(true);
-            createFile.ShowDialog();
+            LabelForm labelForm = new LabelForm(0);
+            labelForm.ShowDialog();
             try
             {
-                if (createFile.create)
+                if (labelForm.done)
                 {
-                    if (!File.Exists(currentPath + "\\" + createFile.path))
+                    if (!File.Exists(currentPath + "\\" + labelForm.text))
                     {
-                        File.Create(currentPath + "\\" + createFile.path);
-                        Report createObject = new Report(currentPath + "\\" + createFile.path);
-                        createObject.Create();
+                        var file = File.Create(currentPath + "\\" + labelForm.text);
+                        director.CreateReport(currentPath + "\\" + labelForm.text);
+                        director.BuildReport();
+                        reports.Add(director.GetReportItem());
+                        file.Close();
                     }
                     else
                         MessageBox.Show("Such a file already exists", "Error");
                 }
-                createFile.Dispose();
+                labelForm.Dispose();
             }
             catch (Exception error)
             {
-                createFile.Dispose();
-                MessageBox.Show("You haven`t access!", "Error");
+                labelForm.Dispose();
+                MessageBox.Show(error.Message.ToString(), "Error");
             }
 
         }
@@ -426,37 +549,38 @@ namespace FileManager1
             }
             string text = content.ToLower();
             text = Regex.Replace(text, "[^0-9a-zA-Z]+", " ");
-            List<string> UnrepeatableWords = new List<string>();
+            string result = "";
             string[] words = Regex.Split(text, @"\s+");
+            Dictionary<string, int> wordIncludes = new Dictionary<string, int>();
 
             foreach (var word in words)
             {
-                int includes = 0;
-                foreach (var word1 in words)
+                if (!wordIncludes.Keys.Contains(word))
                 {
-                    if (word == word1)
-                    {
-                        includes++;
-                    }
+                    wordIncludes.Add(word, 1);
                 }
-                if (includes == 1)
+                else
                 {
-                    UnrepeatableWords.Add(word);
+                    wordIncludes[word] += 1;
                 }
             }
-            if (UnrepeatableWords.Count != 0)
+            if (wordIncludes.ContainsValue(1))
             {
-                string result = "";
-                foreach (var item in UnrepeatableWords)
+                foreach (KeyValuePair<string, int> keyValue in wordIncludes)
                 {
-                    result += item + "\n";
+                    if (keyValue.Value == 1)
+                    {
+                        result += keyValue.Key + "; ";
+                    }
                 }
-                MessageBox.Show(result, "Unrepeatable words is:");
+                File.WriteAllText(Environment.CurrentDirectory.ToString() + "Resource\\Result.txt", result);
+                Process.Start(Environment.CurrentDirectory.ToString() + "Resource\\Result.txt");
             }
             else
             {
-                MessageBox.Show("There isn`t unrepeatable words =(", "Result");
+                MessageBox.Show("There isn`t unrepeatable words!", "Oops...");
             }
+
         }
         public void WordsIncludesInFile(ListView list, bool left)
         {
@@ -504,33 +628,26 @@ namespace FileManager1
                 wordKey.ToLower();
                 bool isFind = false;
                 int position = text.IndexOf(wordKey);
-                while (true)
+                while (position > -1)
                 {
-                    if (position > -1)
+                    isFind = true;
+                    box.SelectionStart = position;
+                    box.SelectionLength = wordKey.Length;
+                    box.SelectionBackColor = Color.Yellow;
+                    if (position + wordKey.Length < text.Length)
                     {
-                        isFind = true;
-                        box.SelectionStart = position;
-                        box.SelectionLength = wordKey.Length;
-                        box.SelectionBackColor = Color.Yellow;
-                        if (position + wordKey.Length < text.Length)
-                        {
-                            position = text.IndexOf(wordKey, position + wordKey.Length);
-                        }
-                        else
-                        {
-                            break;
-                        }
+                        position = text.IndexOf(wordKey, position + wordKey.Length);
                     }
                     else
                     {
-                        if (!isFind)
-                        {
-                            MessageBox.Show("No such symbol combination", "Oops...");
-                        }
                         break;
                     }
-
                 }
+                if (!isFind)
+                {
+                    MessageBox.Show("No such symbol combination", "Oops...");
+                }
+
 
             }
 
@@ -539,33 +656,15 @@ namespace FileManager1
         {
             CommonFile commonFile = new CommonFile(path);
             string content = commonFile.GetText(new HtmlFile(path));
-            int startPosition = content.IndexOf("<title>");
-            int endPosition = content.IndexOf("</title>");
-            while (true)
+            content = content.ToLower();
+            key = key.ToLower();
+            MatchCollection matches = Regex.Matches(content, @"(<\s*title[^>]*>(.*?)<\s*\/\s*title>)");
+            foreach (var match in matches)
             {
-                if (startPosition == -1)
-                {
-                    return false;
-                }
-                else
-                {
-                    if (endPosition == -1)
-                    {
-                        return false;
-                    }
-                    string title = content.Substring(startPosition + 7, endPosition - startPosition);
-                    if (title.Contains(key))
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        startPosition = content.IndexOf("<title>", startPosition + 7);
-                        endPosition = content.IndexOf("</title>", endPosition + 8);
-                    }
-                }
+                if (match.ToString().Contains(key))
+                    return true;
             }
-
+            return false;
         }
         public void SearchHtmlByTitle(ListView list, bool left)
         {
@@ -579,15 +678,16 @@ namespace FileManager1
             {
                 wordkey = searchForm.Content;
             }
+            else
+            {
+                return;
+            }
             pathes.Clear();
-
-            bool isFindFile = false;
             for (int i = 0; i < list.Items.Count; ++i)
             {
                 string path = currentPath + list.Items[i].Text;
                 if (path.Substring(path.LastIndexOf(".") + 1) == "html")
                 {
-                    isFindFile = true;
                     if (StartSearch(path, wordkey))
                     {
                         pathes.Add(path);
@@ -596,17 +696,13 @@ namespace FileManager1
                 }
             }
 
-            if (!isFindFile)
-            {
-                MessageBox.Show("There isn`t html files", "Oops...");
-            }
-            else if (pathes.Count == 0)
+            if (pathes.Count == 0)
             {
                 MessageBox.Show("The search didn`t give result", "Unfortunately");
             }
             else
             {
-                ResultSearch RSerach = new ResultSearch();
+                ResultForm RSerach = new ResultForm();
                 RSerach.ShowDialog();
             }
         }
@@ -635,7 +731,7 @@ namespace FileManager1
             CommonFile commonFile = new CommonFile(currentpath);
             string content;
             content = commonFile.GetText(new HtmlFile(currentpath));
-            HtmlEditor HEdit = new HtmlEditor(content, currentpath, 1);
+            TextEditorForm HEdit = new TextEditorForm(content, currentpath, true);
             HEdit.ShowDialog();
 
         }
@@ -644,26 +740,164 @@ namespace FileManager1
             string content = box.Text;
             int startPosition = content.IndexOf("<title>");
             int endPosition = content.IndexOf("</title>");
-            while (true)
+            while (startPosition > -1 && endPosition > -1)
             {
-                if (startPosition > -1 && endPosition > -1)
+                box.SelectionStart = startPosition + 7;
+                box.SelectionLength = endPosition - startPosition - 7;
+                box.SelectionBackColor = Color.Yellow;
+                if (startPosition + 7 < content.Length && endPosition + 8 < content.Length)
                 {
-                    box.SelectionStart = startPosition + 7;
-                    box.SelectionLength = endPosition - startPosition - 7;
-                    box.SelectionBackColor = Color.Yellow;
-                    if (startPosition + 7 < content.Length && endPosition + 8 < content.Length)
-                    {
-                        startPosition = content.IndexOf("<title>", startPosition + 7);
-                        endPosition = content.IndexOf("</title>", endPosition + 8);
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    startPosition = content.IndexOf("<title>", startPosition + 7);
+                    endPosition = content.IndexOf("</title>", endPosition + 8);
+                }
+                else
+                {
+                    break;
                 }
             }
             box.SelectionStart = 0;
             box.SelectionLength = 0;
+        }
+        public void Select(ListView list, bool left)
+        {
+            string path = list.SelectedItems[0].Text;
+            string currentPath;
+
+            if (left)
+                currentPath = String.Format(@"{0}\\{1}", currentPath1, path);
+            else
+                currentPath = String.Format(@"{0}\\{1}", currentPath2, path);
+            if (list.SelectedItems[0].ImageIndex == 0)
+            {
+                MessageBox.Show("You haven`t chosen a html1 file", "Oops...");
+            }
+            else
+            {
+                try
+                {
+
+                    CommonFile cf = new CommonFile(currentPath);
+                    if (currentPath.Substring(currentPath.LastIndexOf(".") + 1) == "html")
+                    {
+                        contentForMerging = cf.GetText(new HtmlFile(currentPath));
+                    }
+                    else
+                    {
+                        MessageBox.Show("You haven`t chosen a html file", "Oops...");
+                    }
+                }
+                catch (Exception error)
+                {
+                    MessageBox.Show(error.Message.ToString(), "Error");
+                }
+            }
+        }
+        public bool GetPathesOfImg(string content)
+        {
+            string text = content;
+            string pattern = "<img.+?src=[\"'](.+?)[\"'].*?>";
+            List<string> pathes = new List<string>();
+            Regex regex = new Regex(pattern, RegexOptions.IgnoreCase);
+            Match match = regex.Match(text);
+            while (match.Success)
+            {
+                pathes.Add(match.Groups[1].Value);
+                match = match.NextMatch();
+            }
+            foreach (var imgPath in pathes)
+            {
+                if (Regex.IsMatch(imgPath.ToString(), @"^(?:[a-zA-Z]\:|\\\\[\w\.]+\\[\w.$]+)\\(?:[\w]+\\)*\w([\w.])+$"))
+                {
+                    if (File.Exists(imgPath.ToString()))
+                    {
+                        CommonFile currcommonFile = new CommonFile(imgPath.ToString());
+                        filesToCopy.Add(currcommonFile);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Html file exists inadmissble pathes!", "Oops");
+                        return false;
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Html file exists inadmissble pathes!", "Oops");
+                    return false;
+                }
+            }
+            return true;
+        }
+        public void ProcessMerging(string currentPath)
+        {
+            string path = currentPath.Substring(0, currentPath.LastIndexOf("."));
+            if (filesToCopy.Count > 0)
+            {
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                    for (int i = 0; i < filesToCopy.Count; i++)
+                    {
+                        if (!File.Exists(path + "\\" + filesToCopy[i].Name))
+                        {
+                            filesToCopy[i].Copy(path);
+                        }
+                    }
+                }
+            }
+        }
+        public void Merging(ListView list, bool left)
+        {
+            if (contentForMerging == "")
+            {
+                MessageBox.Show("Please select html file", "Oops..");
+                return;
+            }
+            string path = list.SelectedItems[0].Text;
+            string currentPath;
+
+            if (left)
+                currentPath = String.Format(@"{0}\\{1}", currentPath1, path);
+            else
+                currentPath = String.Format(@"{0}\\{1}", currentPath2, path);
+            if (list.SelectedItems[0].ImageIndex == 0)
+            {
+                MessageBox.Show("You haven`t chosen a html1 file", "Oops...");
+            }
+            else
+            {
+                try
+                {
+
+                    CommonFile commonFile = new CommonFile(currentPath);
+                    if (currentPath.Substring(currentPath.LastIndexOf(".") + 1) == "html")
+                    {
+                        filesToCopy.Clear();
+                        string content = commonFile.GetText(new HtmlFile(currentPath));
+                        if (GetPathesOfImg(content) && GetPathesOfImg(contentForMerging))
+                        {     
+                            ProcessMerging(currentPath);
+                            File.AppendAllText(currentPath, contentForMerging);
+                        }
+                        else
+                        {
+                            contentForMerging = "";
+                            return;
+                        }
+
+                    }
+                    else
+                    {
+                        MessageBox.Show("You haven`t chosen a html file", "Oops...");
+                    }
+                }
+                catch (Exception error)
+                {
+                    contentForMerging = "";
+                    MessageBox.Show(error.Message.ToString(), "Error");
+                }
+            }
+            MessageBox.Show("Merging complete", "Result");
+            contentForMerging = "";
         }
     }
 }

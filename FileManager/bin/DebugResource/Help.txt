@@ -47,14 +47,6 @@ TEXT EDITOR
 1.Pressing ESCAPE - set default backgrounds highlight;
 
 \\\\\\\\\\\\\\\\\\\\\\\\\\\
-HTML EDITOR
-============================
-
--MAIN MENU
-1.Pressing SAVE - save this txt file;
-2.Pressing CLEAR - clear this txt file;
-
-\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 REPORT WINDOW
 =============================
 

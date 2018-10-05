@@ -54,7 +54,8 @@ namespace FileManager1
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(665, 18);
             this.label2.TabIndex = 1;
-            this.label2.Text = "The file is located in " + Environment.CurrentDirectory.ToString();
+            this.label2.Text = "The file is located in C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Commun" +
+    "ity\\Common7\\IDE";
             // 
             // button1
             // 
@@ -76,7 +77,7 @@ namespace FileManager1
             this.Controls.Add(this.label1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ReportForm";
-            this.Text = "ReportForm";
+            this.Text = "Report";
             this.ResumeLayout(false);
             this.PerformLayout();
 

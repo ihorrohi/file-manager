@@ -6,33 +6,37 @@ namespace FileManager1
      {
          private string name;
          public string Name
-         {
-           get {return name;}
-           set {name=value;}
-         }
-         public Folder(string path):base(path)
-         {
-             Name = path.Substring(path.LastIndexOf("\\") + 1);
-         }
-          public Folder[] GetFolders()
-         {
-             string[] strFolders = Directory.GetDirectories(Path); 
-             Folder[] folders = new Folder[strFolders.Length];
-             for (int i = 0; i < strFolders.Length; i++)
-             {
-                 folders[i] = new Folder(strFolders[i]);
-             }
-             return folders;
-         }
-          public override void Move( string MovePath)
-          {       
-                  Directory.Move(this.Path, MovePath+"\\"+this.Name);
-          }
-          public override void Delete()
-          {
-              Directory.Delete(this.Path, true);
-          }
-          public override void Copy(string CopyPath)
+        {
+            get { return name; }
+            set { name = value; }
+        }
+        public Folder(string path) : base(path)
+        {
+            Name = path.Substring(path.LastIndexOf("\\") + 1);
+        }
+        public Folder[] GetFolders()
+        {
+            string[] strFolders = Directory.GetDirectories(Path);
+            Folder[] folders = new Folder[strFolders.Length];
+            for (int i = 0; i < strFolders.Length; i++)
+            {
+                folders[i] = new Folder(strFolders[i]);
+            }
+            return folders;
+        }
+        public override void Move(string MovePath)
+        {
+            Directory.Move(this.Path, MovePath + "\\" + this.Name);
+        }
+        public override void Delete()
+        {
+            Directory.Delete(this.Path, true);
+        }
+        public override void Rename(string NewName)
+        {
+            Directory.Move(this.Path, this.Path.Substring(0, this.Path.LastIndexOf("\\") + 1) + NewName);
+        }
+        public override void Copy(string CopyPath)
           {
 
               Folder[] folders = GetFolders();
